@@ -3,43 +3,34 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
-  <title>RA educativa — Demo multi-marcador (PC)</title>
+  <title>RA educativa — Demo PC</title>
 
   <!-- Librerías -->
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar-nft.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
   <style>
     html, body { margin:0; padding:0; overflow:hidden; background:#0b132b; color:#e0e0e0; font-family:system-ui; }
-    #hud {
-      position: fixed; top: 0; left: 0; right: 0;
+    #hud { position: fixed; top: 0; left: 0; right: 0;
       display: flex; gap: .5rem; align-items: center; padding: .5rem .75rem;
-      background: rgba(0,0,0,.35); backdrop-filter: blur(4px);
-      z-index: 5; font-size: 14px;
-    }
+      background: rgba(0,0,0,.35); backdrop-filter: blur(4px); z-index: 5; font-size: 14px; }
     #hud .badge { padding: .2rem .5rem; border-radius: 999px; background: #263159; }
     #hud button { border: 0; padding: .5rem .7rem; border-radius: .6rem; cursor: pointer; background:#1c2541; color:#fff; }
     #hud button:hover { filter: brightness(1.15); }
-    #msg {
-      position: fixed; bottom: .5rem; left: .5rem; right: .5rem;
+    #msg { position: fixed; bottom: .5rem; left: .5rem; right: .5rem;
       background: rgba(0,0,0,.5); padding: .6rem .8rem; border-radius: .6rem; z-index: 5;
-      font-size: 13px; line-height: 1.35;
-    }
-    #fallback {
-      position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 1rem;
-      background: #0b132b; color: #e0e0e0; z-index: 10;
-    }
-    .legend {
-      position: fixed; right: .5rem; bottom: .5rem; background: rgba(0,0,0,.35);
-      padding: .5rem .6rem; border-radius: .6rem; z-index: 5; font-size: 12px;
-    }
+      font-size: 13px; line-height: 1.35; }
+    #fallback { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 1rem;
+      background: #0b132b; color: #e0e0e0; z-index: 10; }
+    .legend { position: fixed; right: .5rem; bottom: .5rem; background: rgba(0,0,0,.35);
+      padding: .5rem .6rem; border-radius: .6rem; z-index: 5; font-size: 12px; }
   </style>
 </head>
 <body>
   <div id="hud">
-    <span class="badge">RA educativa · demo multi-marcador</span>
-    <button id="btnSnap" title="Descargar captura">📸 Capturar</button>
-    <button id="btnHelp" title="Ayuda rápida">❓ Ayuda</button>
+    <span class="badge">RA educativa · multi-marcador</span>
+    <button id="btnSnap">📸 Capturar</button>
+    <button id="btnHelp">❓ Ayuda</button>
     <span style="margin-left:auto"></span>
     <span>Marcadores: <b>hiro</b> (yaguareté), <b>kanji</b> (carpincho)</span>
   </div>
@@ -47,8 +38,7 @@
   <div id="fallback">
     <div>
       <h2>Necesitamos acceso a la cámara</h2>
-      <p>Activalo y recarga la página. Si estás en un aula virtual, abrí este recurso en una nueva pestaña.</p>
-      <p>Como alternativa, podés usar marcadores impresos (hiro / kanji).</p>
+      <p>Activalo y recargá la página. Si estás en un aula virtual, abrí este recurso en una nueva pestaña.</p>
     </div>
   </div>
 
@@ -58,7 +48,7 @@
     <div><b>kanji = “Capy” (carpincho)</b></div>
   </div>
 
-  <!-- ESCENA AR -->
+  <!-- ESCENA -->
   <a-scene 
     vr-mode-ui="enabled: false"
     renderer="antialias: true; alpha: true; precision: mediump"
@@ -68,7 +58,6 @@
     <a-entity light="type: ambient; color: #BBB"></a-entity>
     <a-entity light="type: directional; color: #FFF; intensity: 0.6" position="0 1 1"></a-entity>
 
-    <!-- Marcadores -->
     <a-marker preset="hiro">
       <a-gltf-model src="assets/jaguar.glb" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 180 0"></a-gltf-model>
       <a-entity position="0 1.2 0" text="value: Yasi · yaguareté; color: #fff; align: center; width: 2;"></a-entity>
@@ -83,52 +72,45 @@
   </a-scene>
 
   <script>
-    // Ayuda rápida
+    // Pequeña ayuda
     document.getElementById('btnHelp').addEventListener('click', () => {
-      alert('1) Imprimí los marcadores hiro y kanji.\n2) Permití el uso de la cámara.\n3) Apuntá los marcadores.\n4) Usá 📸 para guardar una captura.');
+      alert('1) Imprimí los marcadores hiro y kanji.\n2) Permití la cámara.\n3) Apuntá los marcadores.\n4) Usá 📸 para guardar una captura.');
     });
 
-    // Captura a PNG
+    // Captura
     document.getElementById('btnSnap').addEventListener('click', () => {
       try {
         const canvas = document.querySelector('canvas');
-        if (!canvas) throw new Error('Canvas no encontrado. Esperá unos segundos.');
         const a = document.createElement('a');
         a.href = canvas.toDataURL('image/png');
         a.download = 'captura_ra.png';
-        document.body.appendChild(a);
         a.click();
-        a.remove();
-      } catch (e) {
-        alert('No se pudo capturar: ' + e.message);
-      }
+      } catch (e) { alert('Error al capturar: ' + e.message); }
     });
 
-    // Esperar la cámara
+    // Activar cámara manualmente si AR.js no lo hace
+    setTimeout(async () => {
+      const video = document.querySelector('video');
+      if (!video) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const v = document.createElement('video');
+          v.srcObject = stream;
+          v.play();
+          console.log('✅ Cámara inicializada manualmente.');
+        } catch (err) {
+          document.getElementById('fallback').style.display = 'grid';
+          document.getElementById('msg').textContent = 'No se pudo abrir la cámara: ' + err.message;
+        }
+      }
+    }, 3000);
+
+    // Mostrar fallback si no aparece el video tras 10 s
     setTimeout(() => {
-      const hasVideo = !!document.querySelector('video');
-      if (!hasVideo) {
+      if (!document.querySelector('video')) {
         document.getElementById('fallback').style.display = 'grid';
-        document.getElementById('msg').textContent = 'No se detectó la cámara. Revisá permisos o usá otro navegador.';
       }
-    }, 6000);
-  </script>
-
-  <!-- Botón manual de permiso -->
-  <button id="permisoCam"
-    style="position:fixed;top:10px;right:10px;z-index:1000;padding:10px 20px;background:#00bcd4;color:white;border:none;border-radius:8px;">
-    🎥 Activar cámara
-  </button>
-  <script>
-    document.getElementById('permisoCam').addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(t => t.stop());
-        alert("✅ Cámara activada correctamente. Recargá la página.");
-      } catch (e) {
-        alert("⚠️ Error al activar cámara: " + e.message);
-      }
-    });
+    }, 10000);
   </script>
 </body>
 </html>
