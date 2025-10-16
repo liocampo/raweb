@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
   <title>RA educativa — Demo multi-marcador (A-Frame + AR.js)</title>
 
-  <!-- Librerías principales -->
+  <!-- Librerías -->
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
-    html, body { margin:0; padding:0; overflow:hidden; background:#0b132b; color:#e0e0e0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+    html, body { margin:0; padding:0; overflow:hidden; background:#0b132b; color:#e0e0e0; font-family: system-ui, sans-serif; }
     #hud {
       position: fixed; top: 0; left: 0; right: 0; 
       display: flex; gap: .5rem; align-items: center; padding: .5rem .75rem;
@@ -41,107 +41,95 @@
   <!-- HUD superior -->
   <div id="hud">
     <span class="badge">RA educativa · multi-marcador</span>
-    <button id="btnSnap" title="Descargar captura">📸 Capturar</button>
-    <button id="btnHelp" title="Ayuda rápida">❓ Ayuda</button>
+    <button id="btnSnap">📸 Capturar</button>
+    <button id="btnHelp">❓ Ayuda</button>
     <span style="margin-left:auto"></span>
     <span>Marcadores: <b>hiro</b> (yaguareté), <b>kanji</b> (carpincho)</span>
   </div>
 
-  <!-- Fallback (si no hay cámara) -->
   <div id="fallback">
     <div>
       <h2>Necesitamos acceso a la cámara</h2>
-      <p>Activalo y recarga la página. Si estás en un aula virtual, abrí este recurso en una nueva pestaña.</p>
-      <p>Como alternativa, podés usar <a href="https://artoolkit.org/documentation/" target="_blank" rel="noopener">marcadores impresos</a> y un navegador compatible.</p>
+      <p>Activalo y recargá la página. Si estás en un aula virtual, abrí este recurso en una nueva pestaña.</p>
+      <p>Podés usar <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/dataNFT/patterns/hiro.patt" target="_blank">marcadores impresos</a>.</p>
     </div>
   </div>
 
-  <div id="msg">Apuntá con la cámara a los marcadores impresos: <b>hiro</b> y <b>kanji</b>. Verás los modelos 3D aparecer sobre ellos.</div>
+  <div id="msg">Apuntá con la cámara a los marcadores impresos: <b>hiro</b> y <b>kanji</b>.</div>
   <div class="legend">
-    <div><b>hiro = “Yasi” (yaguareté)</b> → modelo jaguar.glb</div>
-    <div><b>kanji = “Capy” (carpincho)</b> → modelo capybara_low_poly.glb</div>
+    <div><b>hiro = “Yasi” (yaguareté)</b> → jaguar.glb</div>
+    <div><b>kanji = “Capy” (carpincho)</b> → capybara_low_poly.glb</div>
   </div>
 
-  <!-- ESCENA AR -->
+  <!-- ESCENA -->
   <a-scene 
     vr-mode-ui="enabled: false"
     renderer="antialias: true; alpha: true; precision: mediump"
     embedded
-    arjs="sourceType: webcam; facingMode: user; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+    arjs="sourceType: webcam; facingMode: environment; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
   >
     <!-- Luces -->
     <a-entity light="type: ambient; color: #BBB"></a-entity>
     <a-entity light="type: directional; color: #FFF; intensity: 0.6" position="0 1 1"></a-entity>
 
-    <!-- Marcador 1: preset hiro (yaguareté) -->
+    <!-- Marcadores -->
     <a-marker preset="hiro">
-      <a-gltf-model src="assets/jaguar.glb" 
-                    position="0 0 0" 
-                    scale="0.5 0.5 0.5" 
-                    rotation="0 180 0"></a-gltf-model>
+      <a-gltf-model src="assets/jaguar.glb" position="0 0 0" scale="0.5 0.5 0.5"></a-gltf-model>
       <a-entity position="0 1.2 0" text="value: Yasi · yaguareté; color: #fff; align: center; width: 2;"></a-entity>
     </a-marker>
 
-    <!-- Marcador 2: preset kanji (capibara) -->
     <a-marker preset="kanji">
-      <a-gltf-model src="assets/capybara_low_poly.glb" 
-                    position="0 0 0" 
-                    scale="0.5 0.5 0.5" 
-                    rotation="0 180 0"></a-gltf-model>
+      <a-gltf-model src="assets/capybara_low_poly.glb" position="0 0 0" scale="0.5 0.5 0.5"></a-gltf-model>
       <a-entity position="0 1.4 0" text="value: Capy · capibara; color: #fff; align: center; width: 2;"></a-entity>
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
 
-  <!-- Scripts -->
   <script>
-  // Ayuda rápida
-  document.getElementById('btnHelp').addEventListener('click', () => {
-    alert([
-      '1) Imprimí los marcadores "hiro" y "kanji" (buscá: "AR.js hiro marker" y "AR.js kanji marker").',
-      '2) Permití el uso de la cámara cuando el navegador lo solicite.',
-      '3) Apuntá los marcadores con la cámara del notebook.',
-      '4) Usá 📸 para descargar una captura del canvas.'
-    ].join('\n'));
-  });
-
-  // Captura del canvas
-  document.getElementById('btnSnap').addEventListener('click', () => {
+  // ✅ Forzar cámara frontal en notebooks
+  window.addEventListener('load', async () => {
     try {
-      const canvases = document.getElementsByTagName('canvas');
-      if (!canvases.length) throw new Error('Canvas no encontrado aún. Esperá unos segundos.');
-      const canvas = canvases[0];
-      const url = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'captura_ra.png';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (e) {
-      alert('No pudimos capturar la imagen: ' + e.message);
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoInputs = devices.filter(d => d.kind === 'videoinput');
+      const preferFront = videoInputs.find(d => d.label.toLowerCase().includes('front')) || videoInputs[0];
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: preferFront.deviceId }});
+      const video = document.querySelector('video');
+      if (video) {
+        video.srcObject = stream;
+        video.play();
+      }
+    } catch (err) {
+      console.error("Error al iniciar cámara:", err);
+      document.getElementById('fallback').style.display = 'grid';
     }
   });
 
-  // Si no hay cámara o permisos, mostramos fallback
-  (function waitForCamera(){
-    setTimeout(() => {
-      const hasVideo = !!document.querySelector('video');
-      if (!hasVideo) {
-        document.getElementById('fallback').style.display = 'grid';
-        document.getElementById('msg').textContent = 'No se detectó la cámara. Verificá permisos o probá en otro navegador.';
-      }
-    }, 4000);
-  })();
-
-  // Mantener la cámara activa (evita que se apague en notebooks)
+  // Mantener cámara activa
   setInterval(() => {
     const video = document.querySelector('video');
-    if (video && video.paused) {
-      video.play().catch(()=>{});
-    }
+    if (video && video.paused) video.play().catch(()=>{});
   }, 10000);
+
+  // Captura
+  document.getElementById('btnSnap').addEventListener('click', () => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return alert('Esperá unos segundos más.');
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'captura_ra.png';
+    a.click();
+  });
+
+  // Ayuda
+  document.getElementById('btnHelp').addEventListener('click', () => {
+    alert([
+      '1️⃣ Imprimí los marcadores “hiro” y “kanji”.',
+      '2️⃣ Permití la cámara en el navegador.',
+      '3️⃣ Apuntá los marcadores: verás aparecer los modelos 3D.',
+      '4️⃣ Usá 📸 para guardar una captura.'
+    ].join('\n'));
+  });
   </script>
 </body>
 </html>
