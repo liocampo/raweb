@@ -131,5 +131,22 @@
     }, 4000);
   })();
   </script>
+<button id="permisoCam" style="position:fixed;top:10px;right:10px;z-index:1000;padding:10px 20px;background:#00bcd4;color:white;border:none;border-radius:8px;">
+🎥 Activar cámara
+</button>
+
+<script>
+  document.getElementById('permisoCam').addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }
+      });
+      stream.getTracks().forEach(t => t.stop());
+      alert("✅ Cámara activada correctamente. Recargá la página para continuar.");
+    } catch (e) {
+      alert("⚠️ Error al activar cámara: " + e.message);
+    }
+  });
+</script>
 </body>
 </html>
